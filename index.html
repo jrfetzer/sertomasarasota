@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sertoma Club of Greater Sarasota · Board Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Spectral:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#F6F3EC;--card:#FFFFFF;--ink:#2a2b33;--ink-soft:#54525c;
+    --brand:#9C2A38;--brand-deep:#7d1f2c;--gold:#C4922E;
+    --pos:#1F8A54;--neg:#C0392B;--muted:#8b8178;--line:#e7ded0;--line-soft:#efe8db;
+    --shadow:0 1px 2px rgba(60,30,30,.05), 0 1px 0 rgba(60,30,30,.03);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{background:var(--paper);color:var(--ink);font-family:"Inter",system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+    -webkit-font-smoothing:antialiased;font-size:13px;line-height:1.35;padding:52px 22px 44px}
+  .sheet{max-width:1240px;margin:0 auto}
+
+  .toolbar{position:fixed;top:12px;right:14px;display:flex;align-items:center;gap:8px;background:#fff;border:1px solid var(--line);
+    border-radius:20px;padding:5px 6px 5px 12px;box-shadow:var(--shadow);font-size:10px;font-weight:600;color:var(--ink-soft);z-index:50}
+  .toolbar .dot{width:8px;height:8px;border-radius:50%;background:#c9c2b2}
+  .toolbar.live .dot{background:var(--pos)} .toolbar.offline .dot{background:var(--gold)}
+  .toolbar button{border:1px solid var(--line);background:#fcfaf5;border-radius:14px;padding:3px 9px;font:inherit;font-size:9.5px;cursor:pointer;color:var(--ink-soft)}
+  .toolbar button:hover{background:#f2eee2}
+
+  .head{display:flex;justify-content:space-between;align-items:flex-start;gap:24px;margin-bottom:14px}
+  .wordmark{display:flex;align-items:center;gap:12px}
+  .mark{width:34px;height:34px;border-radius:8px;background:var(--brand);color:#fff;display:flex;align-items:center;justify-content:center;font-family:"Spectral",serif;font-weight:700;font-size:18px;flex:0 0 auto}
+  .wordmark .kick{font-size:9px;letter-spacing:.16em;color:var(--muted);font-weight:700;text-transform:uppercase}
+  .wordmark .title{font-size:17px;font-weight:700;line-height:1;margin-top:2px}
+  .head-right{text-align:right}
+  .club{font-family:"Spectral",Georgia,serif;font-size:22px;font-weight:600;line-height:1.05}
+  .subtitle{font-size:10.5px;color:var(--muted);margin-top:5px;font-weight:500}
+
+  .seedbar{background:#f4e7d2;border:1px solid #e6cfa9;color:#8a641f;font-size:10.5px;font-weight:600;border-radius:8px;
+    padding:7px 12px;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+  .seedbar .pill{background:#8a641f;color:#f4e7d2;border-radius:20px;padding:1px 8px;font-size:9px;letter-spacing:.05em}
+
+  .kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:14px}
+  .kpi{background:var(--card);border:1px solid var(--line);border-radius:11px;padding:13px 14px 14px;box-shadow:var(--shadow);display:flex;flex-direction:column}
+  .kpi .lab{font-size:8.5px;letter-spacing:.12em;font-weight:700;color:var(--muted);text-transform:uppercase}
+  .kpi .big{font-size:30px;font-weight:800;letter-spacing:-.02em;line-height:1.05;margin-top:7px;display:flex;align-items:baseline;gap:8px}
+  .kpi .delta{font-size:11px;font-weight:700}
+  .kpi .delta.pos{color:var(--pos)} .kpi .delta.neg{color:var(--neg)}
+  .kpi .sub{font-size:10px;color:var(--muted);margin-top:5px;font-weight:500}
+  .kpi .foot{font-size:9.5px;color:var(--muted);margin-top:auto;padding-top:9px;font-weight:500}
+  .kpi.dark{background:var(--brand);border-color:var(--brand)}
+  .kpi.dark .lab{color:#e7b9bf}.kpi.dark .big{color:#fff}.kpi.dark .sub,.kpi.dark .foot{color:#e9c4ca}
+  .kpi.dark .countdown{font-size:11px;font-weight:700;color:#fff}
+
+  .panel{background:var(--card);border:1px solid var(--line);border-radius:11px;padding:15px 16px;box-shadow:var(--shadow)}
+  .eyebrow{font-size:8.5px;letter-spacing:.14em;font-weight:700;color:var(--brand);text-transform:uppercase}
+  .h{font-family:"Spectral",Georgia,serif;font-size:17px;font-weight:600;margin:3px 0 0;line-height:1.1}
+  .panel-head{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+  .panel-head .rt{font-size:9.5px;color:var(--muted);text-align:right;font-weight:600}
+
+  .therm-panel{margin-bottom:12px}
+  .therms{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:12px}
+  .therm{border:1px solid var(--line-soft);border-radius:10px;padding:13px 12px 14px;background:#fcfaf5;display:flex;flex-direction:column;align-items:center}
+  .therm .ev{font-family:"Spectral",serif;font-size:15px;font-weight:600;text-align:center;line-height:1.1}
+  .therm .dt{font-size:9.5px;color:var(--muted);font-weight:600;margin-top:2px;text-transform:uppercase;letter-spacing:.04em}
+  .therm .viz{display:flex;align-items:flex-end;gap:12px;margin:8px 0 4px}
+  .therm .nums{text-align:left}
+  .therm .pct{font-size:26px;font-weight:800;letter-spacing:-.02em;line-height:1;color:var(--brand)}
+  .therm .raised{font-size:15px;font-weight:800;margin-top:6px}
+  .therm .goal{font-size:10px;color:var(--muted);font-weight:600;margin-top:1px}
+  .therm .meta{font-size:9.5px;color:var(--ink-soft);font-weight:500;margin-top:8px;text-align:center;line-height:1.3}
+  .therm .meta b{color:var(--ink);font-weight:700}
+
+  .grid{display:grid;grid-template-columns:1.15fr 1fr 1fr;gap:12px;align-items:start}
+  .col{display:flex;flex-direction:column;gap:12px}
+
+  .memstats{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:12px}
+  .ms{border:1px solid var(--line-soft);border-radius:9px;padding:9px 10px;background:#fcfaf5}
+  .ms .k{font-size:8px;letter-spacing:.09em;font-weight:700;color:var(--muted);text-transform:uppercase}
+  .ms .v{font-size:19px;font-weight:800;margin-top:3px;letter-spacing:-.02em}
+  .ms .d{font-size:9px;color:var(--muted);font-weight:500;margin-top:1px}
+
+  .finhi{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:12px}
+  .fh{border:1px solid var(--line-soft);border-radius:9px;padding:9px 10px;background:#fcfaf5}
+  .fh .k{font-size:8px;letter-spacing:.09em;font-weight:700;color:var(--muted);text-transform:uppercase}
+  .fh .v{font-size:20px;font-weight:800;margin-top:3px;letter-spacing:-.02em}
+  .fh .d{font-size:9px;color:var(--muted);font-weight:500;margin-top:1px}
+  .pdfbtn{display:flex;align-items:center;gap:10px;margin-top:11px;padding:11px 12px;border:1px solid var(--line);border-radius:10px;background:#fcfaf5;text-decoration:none;color:var(--ink)}
+  .pdfbtn:hover{background:#f6efe2;border-color:#e0cfae}
+  .pdfbtn.disabled{opacity:.55;pointer-events:none}
+  .pdfbtn .ic{background:var(--brand);color:#fff;font-size:8.5px;font-weight:800;letter-spacing:.04em;padding:4px 6px;border-radius:5px;flex:0 0 auto}
+  .pdfbtn .t{font-size:11.5px;font-weight:700;line-height:1.15}
+  .pdfbtn .t em{display:block;font-style:normal;font-size:9px;font-weight:500;color:var(--muted);margin-top:2px}
+  .pdfbtn .arw{margin-left:auto;color:var(--brand);font-weight:700;font-size:14px}
+  .fnote{font-size:9px;color:var(--muted);font-weight:500;margin-top:9px;text-align:center}
+
+  .cal{margin-top:10px;display:flex;flex-direction:column;gap:2px}
+  .cal .ev{display:grid;grid-template-columns:44px 1fr;gap:10px;align-items:center;padding:7px 0;border-bottom:1px solid var(--line-soft)}
+  .cal .ev:last-child{border-bottom:none}
+  .cal .date{background:#fcfaf5;border:1px solid var(--line-soft);border-radius:8px;text-align:center;padding:4px 2px;line-height:1}
+  .cal .date .mo{font-size:8px;font-weight:700;letter-spacing:.06em;color:var(--brand);text-transform:uppercase}
+  .cal .date .dy{font-size:16px;font-weight:800;margin-top:1px}
+  .cal .info b{font-size:11.5px;font-weight:600;display:block}
+  .cal .info span{font-size:9.5px;color:var(--muted);font-weight:500}
+  .cal .tag{font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;padding:1px 6px;border-radius:10px;margin-left:6px;vertical-align:middle}
+  .tag.board{background:#efe1e3;color:var(--brand)} .tag.social{background:#e5efe8;color:var(--pos)} .tag.event{background:#f4ecd8;color:var(--gold)}
+
+  .foot-note{display:flex;justify-content:space-between;align-items:center;margin-top:18px;padding-top:11px;border-top:1px solid var(--line);font-size:9px;color:var(--muted);font-weight:500}
+  .foot-note b{color:var(--ink-soft);font-weight:600}
+
+  @media (max-width:1080px){.kpis{grid-template-columns:repeat(2,1fr)}.therms{grid-template-columns:1fr}.grid{grid-template-columns:1fr}}
+  @media print{body{padding:0;background:#fff}.toolbar{display:none}.kpi,.panel{box-shadow:none}}
+</style>
+</head>
+<body>
+<div class="toolbar" id="tb"><span class="dot"></span><span id="tbtxt">Loading…</span>
+  <button onclick="refresh()">Refresh</button><button onclick="window.print()">Print</button></div>
+<div class="sheet" id="sheet"></div>
+
+<script>
+/* =====================================================================
+   LIVE SOURCES — the four PUBLIC published-CSV tabs (never the red ones).
+   ===================================================================== */
+const BASE="https://docs.google.com/spreadsheets/d/e/2PACX-1vROms2UFRIYSpMLQ3aPY2Nd832uhSKfb7vdrQjrLWGA700qg8Q8rilLQE96wAHA7_wTd7c_-QLvvpUy/pub";
+const SOURCES={
+  overview: BASE+"?gid=1406265620&single=true&output=csv",  // Overview
+  trend:    BASE+"?gid=766757637&single=true&output=csv",   // Members_Trend
+  events:   BASE+"?gid=1037078599&single=true&output=csv",  // Events
+  calendar: BASE+"?gid=1556868187&single=true&output=csv"   // Calendar
+};
+const MONTHS=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+
+/* =====================================================================
+   SEED — fallback / first paint. Live data overrides each part.
+   ===================================================================== */
+const SEED={
+  header:{club:"Sertoma Club of Greater Sarasota", subtitle:"Board Dashboard", prepared_by:"Prepared by Josh Fetzer, Treasurer", status:"SAMPLE DATA"},
+  members:{total:72, gained:3, lost:1, renewals_due:8, community_ytd:46000,
+    trend:[64,66,67,69,70,71,70,72], trend_labels:["Feb","Mar","Apr","May","Jun","Jul","Aug","Sep"]},
+  financials:{fiscal_year:"FY2026–27", form_990_url:"", annual_revenue:214000, to_mission_pct:0.71, filed:"filed May 2026"},
+  events:[
+    {name:"Fashion Show", date:"2026-10-15", goal:40000, raised:31200, tickets:180, sponsors:9, date_tbd:false},
+    {name:"Golf Tournament", date:"2026-11-16", goal:75000, raised:38500, tickets:96, sponsors:14, date_tbd:false},
+    {name:"My Hometown Fest", date:"2027-03-15", goal:100000, raised:12000, tickets:0, sponsors:5, date_tbd:true}
+  ],
+  calendar:[
+    {date:"2026-10-02", title:"Member Happy Hour", type:"social", note:"5:30 PM · The Blue Rooster"},
+    {date:"2026-10-15", title:"Fashion Show", type:"event", note:"Main fundraiser"}
+  ],
+  footer:"Service to Mankind · Sertoma Club of Greater Sarasota"
+};
+
+/* helpers */
+const $=(h)=>{const t=document.createElement("template");t.innerHTML=h.trim();return t.content.firstChild;};
+const money=n=>"$"+Math.round(n).toLocaleString();
+const kMoney=n=>n>=1000?"$"+(n/1000).toFixed(n%1000?1:0)+"k":"$"+n;
+function num(x){if(x==null)return null;let s=String(x).trim();if(s===""||s==="–")return null;const pct=s.includes("%");s=s.replace(/[$,%\s]/g,"");const n=parseFloat(s);if(isNaN(n))return null;return pct?n/100:n;}
+const str=x=>x==null?"":String(x).trim();
+const truthy=x=>/^(true|yes|1)$/i.test(str(x));
+function daysUntil(iso){const d=new Date(iso+"T00:00:00");const now=new Date();now.setHours(0,0,0,0);return Math.round((d-now)/86400000);}
+function fmtDate(iso,tbd){const m=String(iso).match(/(\d{4})-(\d{2})-(\d{2})/);if(!m)return iso;const mo=MONTHS[+m[2]-1];return tbd?(mo+" "+m[1]+" · TBD"):(mo+" "+(+m[3]));}
+
+/* CSV parser */
+function parseCSV(text){const rows=[];let row=[],cur="",q=false;
+  for(let i=0;i<text.length;i++){const ch=text[i];
+    if(q){if(ch=='"'){if(text[i+1]=='"'){cur+='"';i++;}else q=false;}else cur+=ch;}
+    else{if(ch=='"')q=true;else if(ch==','){row.push(cur);cur="";}
+      else if(ch=='\n'){row.push(cur);rows.push(row);row=[];cur="";}else if(ch=='\r'){}else cur+=ch;}}
+  if(cur!==""||row.length){row.push(cur);rows.push(row);}return rows;}
+
+/* parsers — return null if a tab isn't the shape we expect */
+function parseOverview(rows){
+  if(!rows.length||str(rows[0][0]).toLowerCase()!=="field")return null;
+  const m={};for(let i=1;i<rows.length;i++){const k=str(rows[i][0]);if(k)m[k]=rows[i][1];}
+  return Object.keys(m).length?m:null;
+}
+function parseTrend(rows){
+  const h=rows.findIndex(r=>str(r[0])==="Month"&&str(r[1])==="Count");if(h<0)return null;
+  const labels=[],series=[];
+  for(let i=h+1;i<rows.length;i++){const mo=str(rows[i][0]);const c=num(rows[i][1]);
+    if(!mo||c==null)continue;labels.push(mo.split(" ")[0].slice(0,3));series.push(c);}
+  return series.length?{labels,series}:null;
+}
+function parseEvents(rows){
+  const h=rows.findIndex(r=>str(r[0])==="Event"&&r.map(str).includes("Goal"));if(h<0)return null;
+  const out=[];
+  for(let i=h+1;i<rows.length;i++){const nm=str(rows[i][0]);if(!nm)continue;
+    out.push({name:nm,date:str(rows[i][1]),date_tbd:truthy(rows[i][2]),
+      goal:num(rows[i][3])||0,raised:num(rows[i][4])||0,sponsors:num(rows[i][5])||0,tickets:num(rows[i][6])||0});}
+  return out.length?out:null;
+}
+function parseCalendar(rows){
+  const h=rows.findIndex(r=>str(r[0])==="Date"&&r.map(str).includes("Publish"));if(h<0)return null;
+  const out=[];
+  for(let i=h+1;i<rows.length;i++){const dt=str(rows[i][0]);if(!dt)continue;
+    if(!truthy(rows[i][4]))continue;      // honour the Publish toggle
+    out.push({date:dt,title:str(rows[i][1]),type:str(rows[i][2]).toLowerCase()||"event",note:str(rows[i][3])});}
+  return out.length?out:null;
+}
+const PARSERS={overview:parseOverview,trend:parseTrend,events:parseEvents,calendar:parseCalendar};
+
+/* merge fetched data over a clone of SEED */
+const clone=o=>JSON.parse(JSON.stringify(o));
+function buildLive(out){
+  const D=clone(SEED), o=out.overview;
+  if(o){
+    if(str(o.Club_Name))D.header.club=str(o.Club_Name);
+    if(str(o.Report_Month))D.header.subtitle="Board Dashboard · "+str(o.Report_Month);
+    if(str(o.Prepared_By))D.header.prepared_by="Prepared by "+str(o.Prepared_By);
+    if(str(o.Data_Status))D.header.status=str(o.Data_Status);
+    if(str(o.Fiscal_Year))D.financials.fiscal_year=str(o.Fiscal_Year);
+    const g=k=>num(o[k]);
+    if(g("Total_Members")!=null)D.members.total=g("Total_Members");
+    if(g("Members_Gained")!=null)D.members.gained=g("Members_Gained");
+    if(g("Members_Lost")!=null)D.members.lost=g("Members_Lost");
+    if(g("Renewals_Due_60")!=null)D.members.renewals_due=g("Renewals_Due_60");
+    if(g("Community_YTD")!=null)D.members.community_ytd=g("Community_YTD");
+    if(g("Annual_Revenue_990")!=null)D.financials.annual_revenue=g("Annual_Revenue_990");
+    if(g("To_Mission_Pct")!=null)D.financials.to_mission_pct=g("To_Mission_Pct");
+    if(str(o.Form_990_URL))D.financials.form_990_url=str(o.Form_990_URL);
+    if(str(o.Form_990_Filed))D.financials.filed=str(o.Form_990_Filed);
+  }
+  if(out.trend){D.members.trend=out.trend.series;D.members.trend_labels=out.trend.labels;}
+  if(out.events)D.events=out.events;
+  if(out.calendar)D.calendar=out.calendar;
+  return D;
+}
+
+/* charts */
+function thermSVG(pct){
+  const p=Math.max(0,Math.min(1,pct));
+  const W=64,H=190,tubeX=24,tubeW=16,top=12,bottom=150,bulbCY=166,bulbR=17;
+  const fillH=(bottom-top)*p,fillY=bottom-fillH;
+  const ticks=[0,.25,.5,.75,1].map(t=>{const y=bottom-(bottom-top)*t;
+    return `<line x1="${tubeX+tubeW+3}" x2="${tubeX+tubeW+8}" y1="${y}" y2="${y}" stroke="#c9bfb2" stroke-width="1"></line>`;}).join("");
+  return `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">
+    <defs><linearGradient id="merc" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#c0392b"></stop><stop offset="1" stop-color="#9C2A38"></stop></linearGradient></defs>
+    <rect x="${tubeX}" y="${top}" width="${tubeW}" height="${bottom-top+6}" rx="${tubeW/2}" fill="#ece4d7"></rect>
+    <circle cx="${tubeX+tubeW/2}" cy="${bulbCY}" r="${bulbR}" fill="#ece4d7"></circle>
+    <circle cx="${tubeX+tubeW/2}" cy="${bulbCY}" r="${bulbR-3}" fill="url(#merc)"></circle>
+    <rect x="${tubeX+2}" y="${fillY}" width="${tubeW-4}" height="${fillH+8}" rx="${(tubeW-4)/2}" fill="url(#merc)"></rect>
+    ${ticks}<rect x="${tubeX}" y="${top}" width="${tubeW}" height="${bottom-top+6}" rx="${tubeW/2}" fill="none" stroke="#d8cebf" stroke-width="1"></rect></svg>`;
+}
+function lineChart(series,labels){
+  const W=250,H=80,padL=4,padR=4,padT=8,padB=14;
+  const min=Math.min(...series)-2,max=Math.max(...series)+2;
+  const x=i=>padL+(i/(series.length-1||1))*(W-padL-padR);
+  const y=v=>padT+(1-(v-min)/((max-min)||1))*(H-padT-padB);
+  const line=series.map((v,i)=>`${i?'L':'M'}${x(i).toFixed(1)},${y(v).toFixed(1)}`).join(" ");
+  const area=`M${x(0)},${y(min)} `+series.map((v,i)=>`L${x(i).toFixed(1)},${y(v).toFixed(1)}`).join(" ")+` L${x(series.length-1)},${y(min)} Z`;
+  const dots=series.map((v,i)=>`<circle cx="${x(i).toFixed(1)}" cy="${y(v).toFixed(1)}" r="1.7" fill="var(--brand)"></circle>`).join("");
+  const xl=labels.map((l,i)=>`<text x="${x(i)}" y="${H-3}" font-size="6.5" fill="#b3a99c" text-anchor="middle">${l}</text>`).join("");
+  const last=series.length-1;
+  return `<svg width="100%" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" style="display:block">
+    <path d="${area}" fill="rgba(156,42,56,.09)"></path>
+    <path d="${line}" fill="none" stroke="var(--brand)" stroke-width="2" stroke-linejoin="round"></path>${dots}${xl}
+    <text x="${x(last)-2}" y="${y(series[last])-5}" font-size="9" font-weight="800" fill="var(--ink)" text-anchor="end">${series[last]}</text></svg>`;
+}
+
+/* render */
+function render(D){
+  const sheet=document.getElementById("sheet");sheet.innerHTML="";
+  sheet.appendChild($(`<div class="head">
+    <div class="wordmark"><div class="mark">S</div><div><div class="kick">Sertoma</div><div class="title">Club Dashboard</div></div></div>
+    <div class="head-right"><div class="club">${D.header.club}</div>
+      <div class="subtitle">${D.header.subtitle} &nbsp;·&nbsp; ${D.header.prepared_by}</div></div></div>`));
+
+  if(D.header.status && D.header.status.toUpperCase()!=="LIVE")
+    sheet.appendChild($(`<div class="seedbar"><span class="pill">${D.header.status}</span>
+      Placeholder figures for layout review — swap in real club data once the sheet is set up.</div>`));
+
+  const m=D.members, net=m.gained-m.lost;
+  const raisedYTD=D.events.reduce((a,e)=>a+e.raised,0), goalYTD=D.events.reduce((a,e)=>a+e.goal,0);
+  const upcoming=[...D.events].map(e=>({...e,d:daysUntil(e.date)})).filter(e=>e.d>=0).sort((a,b)=>a.d-b.d);
+  const nextEv=upcoming[0]||D.events[0];
+  sheet.appendChild($(`<div class="kpis">
+    <div class="kpi"><div class="lab">Total Members</div>
+      <div class="big">${m.total}<span class="delta ${net>=0?'pos':'neg'}">${net>=0?'▲ +':'▼ '}${net} MoM</span></div>
+      <div class="sub">active dues-paying</div><div class="foot">${m.renewals_due} renewals due in 60 days</div></div>
+    <div class="kpi"><div class="lab">New This Month</div>
+      <div class="big">${m.gained}<span class="delta pos">▲</span></div>
+      <div class="sub">joined this cycle</div><div class="foot">net ${net>=0?'+':''}${net} overall</div></div>
+    <div class="kpi"><div class="lab">Dropped This Month</div>
+      <div class="big">${m.lost}<span class="delta neg">▼</span></div>
+      <div class="sub">resigned / lapsed</div><div class="foot">${m.total} active after changes</div></div>
+    <div class="kpi"><div class="lab">Raised This Year</div>
+      <div class="big">${kMoney(raisedYTD)}</div>
+      <div class="sub">across ${D.events.length} campaigns</div>
+      <div class="foot">${goalYTD?Math.round(raisedYTD/goalYTD*100):0}% of ${kMoney(goalYTD)} combined goal</div></div>
+    <div class="kpi dark"><div class="lab">Next Event</div>
+      <div class="big" style="font-size:22px">${nextEv.name}</div>
+      <div class="countdown">${fmtDate(nextEv.date,nextEv.date_tbd)}${nextEv.d>=0?" · in "+nextEv.d+" days":""}</div>
+      <div class="foot">${money(nextEv.raised)} of ${money(nextEv.goal)} raised</div></div>
+  </div>`));
+
+  const therms=D.events.map(e=>{const pct=e.goal?e.raised/e.goal:0;
+    return `<div class="therm"><div class="ev">${e.name}</div><div class="dt">${fmtDate(e.date,e.date_tbd)}</div>
+      <div class="viz">${thermSVG(pct)}<div class="nums"><div class="pct">${Math.round(pct*100)}%</div>
+        <div class="raised">${money(e.raised)}</div><div class="goal">of ${money(e.goal)} goal</div></div></div>
+      <div class="meta"><b>${e.sponsors}</b> sponsors${e.tickets?` · <b>${e.tickets}</b> tickets`:""} · <b>${money(Math.max(0,e.goal-e.raised))}</b> to go</div></div>`;
+  }).join("");
+  sheet.appendChild($(`<div class="panel therm-panel">
+    <div class="panel-head"><div><div class="eyebrow">Fundraising</div><div class="h">Campaign Thermometers</div></div>
+      <div class="rt">${money(raisedYTD)} of ${money(goalYTD)}<br>${goalYTD?Math.round(raisedYTD/goalYTD*100):0}% of combined goal</div></div>
+    <div class="therms">${therms}</div></div>`));
+
+  const grid=$(`<div class="grid"></div>`);
+  const memCol=$(`<div class="col"></div>`);
+  memCol.appendChild($(`<div class="panel">
+    <div class="panel-head"><div><div class="eyebrow">Membership</div><div class="h">Roster &amp; Movement</div></div>
+      <div class="rt">${m.total} members<br>net ${net>=0?'+':''}${net} this month</div></div>
+    <div style="margin-top:10px">${lineChart(m.trend,m.trend_labels)}</div>
+    <div class="memstats">
+      <div class="ms"><div class="k">Joined</div><div class="v" style="color:var(--pos)">+${m.gained}</div><div class="d">this month</div></div>
+      <div class="ms"><div class="k">Departed</div><div class="v" style="color:var(--neg)">−${m.lost}</div><div class="d">this month</div></div>
+      <div class="ms"><div class="k">Renewals Due</div><div class="v">${m.renewals_due}</div><div class="d">next 60 days</div></div>
+      <div class="ms"><div class="k">To Community</div><div class="v">${kMoney(m.community_ytd)}</div><div class="d">YTD · grants &amp; service</div></div>
+    </div></div>`));
+  grid.appendChild(memCol);
+
+  const fin=D.financials, has990=fin.form_990_url && fin.form_990_url!=="#";
+  const finCol=$(`<div class="col"></div>`);
+  finCol.appendChild($(`<div class="panel">
+    <div class="panel-head"><div><div class="eyebrow">Transparency</div><div class="h">Financials &amp; 990</div></div>
+      <div class="rt">${fin.fiscal_year}</div></div>
+    <div class="finhi">
+      <div class="fh"><div class="k">Annual Revenue</div><div class="v">${money(fin.annual_revenue)}</div><div class="d">most recent 990</div></div>
+      <div class="fh"><div class="k">To Mission</div><div class="v">${Math.round(fin.to_mission_pct*100)}%</div><div class="d">of expenses</div></div>
+    </div>
+    <a class="pdfbtn ${has990?'':'disabled'}" href="${has990?fin.form_990_url:'#'}" target="_blank" rel="noopener">
+      <span class="ic">PDF</span><span class="t">${has990?'View our latest Form 990':'Form 990 — add link in sheet'}<em>${fin.filed} · IRS public filing</em></span><span class="arw">↗</span></a>
+    <div class="fnote">We publish our full financials for member and donor transparency.</div></div>`));
+  grid.appendChild(finCol);
+
+  const calCol=$(`<div class="col"></div>`);
+  calCol.appendChild($(`<div class="panel">
+    <div class="panel-head"><div><div class="eyebrow">Calendar</div><div class="h">What's Coming Up</div></div></div>
+    <div class="cal">${D.calendar.map(c=>{const mm=String(c.date).match(/(\d{4})-(\d{2})-(\d{2})/);if(!mm)return"";
+      return `<div class="ev"><div class="date"><div class="mo">${MONTHS[+mm[2]-1]}</div><div class="dy">${+mm[3]}</div></div>
+        <div class="info"><b>${c.title}<span class="tag ${c.type}">${c.type}</span></b><span>${c.note}</span></div></div>`;}).join("")}</div></div>`));
+  grid.appendChild(calCol);
+  sheet.appendChild(grid);
+
+  sheet.appendChild($(`<div class="foot-note"><div><b>${D.footer}</b> &nbsp; ${D.financials.fiscal_year}</div>
+    <div>Board dashboard · live</div></div>`));
+}
+
+/* live loader */
+function setStatus(state,out){
+  const tb=document.getElementById("tb"),t=document.getElementById("tbtxt");
+  tb.className="toolbar "+(state==="live"?"live":state==="offline"?"offline":"");
+  if(state==="loading")t.textContent="Refreshing…";
+  else if(state==="live")t.textContent="Live · "+new Date().toLocaleTimeString([], {hour:"2-digit",minute:"2-digit"});
+  else t.textContent=(location.protocol==="file:")?"Snapshot · host over http to go live":"Showing last snapshot";
+  if(out){const fails=Object.keys(SOURCES).filter(k=>!out[k]);
+    tb.title=(location.protocol==="file:")?"Opened as a local file — serve over http(s) to go live."
+      :(fails.length?("Not refreshed from: "+fails.join(", ")):"All four tabs live");}
+}
+async function refresh(){
+  setStatus("loading");const out={};
+  await Promise.all(Object.entries(SOURCES).map(async([key,url])=>{
+    try{const res=await fetch(url,{redirect:"follow"});if(!res.ok)throw new Error("HTTP "+res.status);
+      out[key]=PARSERS[key](parseCSV(await res.text()));}
+    catch(e){out[key]=null;console.warn(key,"failed:",e.message);}}));
+  const anyOk=out.overview||out.trend||out.events||out.calendar;
+  render(buildLive(out));
+  setStatus(anyOk?"live":"offline",out);
+}
+
+render(SEED);
+refresh();
+setInterval(refresh, 5*60*1000);
+</script>
+</body>
+</html>
