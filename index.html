@@ -10,7 +10,7 @@
 <style>
   :root{
     --paper:#F6F3EC;--card:#FFFFFF;--ink:#2a2b33;--ink-soft:#54525c;
-    --brand:#9C2A38;--brand-deep:#7d1f2c;--gold:#C4922E;
+    --brand:#0c223f;--brand-deep:#081a2f;--gold:#f4bc49;--gold-deep:#a9791f;
     --pos:#1F8A54;--neg:#C0392B;--muted:#8b8178;--line:#e7ded0;--line-soft:#efe8db;
     --shadow:0 1px 2px rgba(60,30,30,.05), 0 1px 0 rgba(60,30,30,.03);
   }
@@ -49,7 +49,7 @@
   .kpi .sub{font-size:10px;color:var(--muted);margin-top:5px;font-weight:500}
   .kpi .foot{font-size:9.5px;color:var(--muted);margin-top:auto;padding-top:9px;font-weight:500}
   .kpi.dark{background:var(--brand);border-color:var(--brand)}
-  .kpi.dark .lab{color:#e7b9bf}.kpi.dark .big{color:#fff}.kpi.dark .sub,.kpi.dark .foot{color:#e9c4ca}
+  .kpi.dark .lab{color:#e4c987}.kpi.dark .big{color:#fff}.kpi.dark .sub,.kpi.dark .foot{color:#aebfd0}
   .kpi.dark .countdown{font-size:11px;font-weight:700;color:#fff}
 
   .panel{background:var(--card);border:1px solid var(--line);border-radius:11px;padding:15px 16px;box-shadow:var(--shadow)}
@@ -103,7 +103,7 @@
   .cal .info b{font-size:11.5px;font-weight:600;display:block}
   .cal .info span{font-size:9.5px;color:var(--muted);font-weight:500}
   .cal .tag{font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;padding:1px 6px;border-radius:10px;margin-left:6px;vertical-align:middle}
-  .tag.board{background:#efe1e3;color:var(--brand)} .tag.social{background:#e5efe8;color:var(--pos)} .tag.event{background:#f4ecd8;color:var(--gold)}
+  .tag.board{background:#e3e8f0;color:var(--brand)} .tag.social{background:#e5efe8;color:var(--pos)} .tag.event{background:#f7edd4;color:var(--gold-deep)}
 
   .foot-note{display:flex;justify-content:space-between;align-items:center;margin-top:18px;padding-top:11px;border-top:1px solid var(--line);font-size:9px;color:var(--muted);font-weight:500}
   .foot-note b{color:var(--ink-soft);font-weight:600}
@@ -234,7 +234,7 @@ function thermSVG(pct){
   const ticks=[0,.25,.5,.75,1].map(t=>{const y=bottom-(bottom-top)*t;
     return `<line x1="${tubeX+tubeW+3}" x2="${tubeX+tubeW+8}" y1="${y}" y2="${y}" stroke="#c9bfb2" stroke-width="1"></line>`;}).join("");
   return `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">
-    <defs><linearGradient id="merc" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#c0392b"></stop><stop offset="1" stop-color="#9C2A38"></stop></linearGradient></defs>
+    <defs><linearGradient id="merc" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#d99a2e"></stop><stop offset="1" stop-color="#f4bc49"></stop></linearGradient></defs>
     <rect x="${tubeX}" y="${top}" width="${tubeW}" height="${bottom-top+6}" rx="${tubeW/2}" fill="#ece4d7"></rect>
     <circle cx="${tubeX+tubeW/2}" cy="${bulbCY}" r="${bulbR}" fill="#ece4d7"></circle>
     <circle cx="${tubeX+tubeW/2}" cy="${bulbCY}" r="${bulbR-3}" fill="url(#merc)"></circle>
@@ -252,7 +252,7 @@ function lineChart(series,labels){
   const xl=labels.map((l,i)=>`<text x="${x(i)}" y="${H-3}" font-size="6.5" fill="#b3a99c" text-anchor="middle">${l}</text>`).join("");
   const last=series.length-1;
   return `<svg width="100%" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" style="display:block">
-    <path d="${area}" fill="rgba(156,42,56,.09)"></path>
+    <path d="${area}" fill="rgba(12,34,63,.09)"></path>
     <path d="${line}" fill="none" stroke="var(--brand)" stroke-width="2" stroke-linejoin="round"></path>${dots}${xl}
     <text x="${x(last)-2}" y="${y(series[last])-5}" font-size="9" font-weight="800" fill="var(--ink)" text-anchor="end">${series[last]}</text></svg>`;
 }
